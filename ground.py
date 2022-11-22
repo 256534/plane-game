@@ -17,6 +17,6 @@ class Ground(Sprite):
         self.rect.midbottom = self.screen_rect.midbottom
     def update(self):
         #scrolling
-        self.counter += 1
+        self.rect.x -= 2
     def draw(self):
         self.screen.blit(self.image, self.rect)

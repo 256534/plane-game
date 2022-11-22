@@ -14,9 +14,10 @@ class Plane(Sprite):
 
     def update(self):
         self.vel += 0.5
+        # create gravity
         if self.vel > 9:
             self.vel = 9
-        if self.rect.bottom < 400:
+        if self.rect.bottom < 500:
             self.rect.y += int(self.vel)
 
         #moving
