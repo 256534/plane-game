@@ -7,8 +7,6 @@ background = pygame.image.load('images/background.png')
 
 running = True
 
-
-
 while running:
     screen.fill((255,255,255))
     screen.blit(background, (0,0))

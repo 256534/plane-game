@@ -20,3 +20,4 @@ class Ground(Sprite):
         self.rect.x -= 2
     def draw(self):
         self.screen.blit(self.image, self.rect)
+
