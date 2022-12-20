@@ -29,5 +29,6 @@ class Plane(Sprite):
         self.screen.blit(self.image, self.rect)
 
     def crash(self):
+        #new image for crash
         self.image = pygame.image.load('images/explosion.png')
         self.image = pygame.transform.rotozoom(self.image, 0, .15)
