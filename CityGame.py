@@ -40,8 +40,6 @@ def draw_background():
 def play():
     # settings
     clock = pygame.time.Clock()
-    fps = 60
-    game_over = False
     font = pygame.font.SysFont('comicsans', 24)
     score = 0
     obstacles_passed = False
@@ -82,13 +80,15 @@ def play():
         # check for collision
         cloud_collision = pygame.sprite.spritecollide(plane, cloud_group, True)
         house_collision = pygame.sprite.spritecollide(plane, house_group, True)
+
         if cloud_collision or house_collision:
             #crash sound & explosion image
             plane.crash()
             pygame.mixer.Sound.play(crash_sound)
             pygame.mixer.music.stop()
-
+            pygame.time.wait(1000)
             run = False
+
 
         #draw clouds on screen
         cloud_group.draw(screen)
@@ -99,7 +99,6 @@ def play():
         # draw plane on screen
         plane.draw()
         plane.update()
-
 
         # count how many houses player has successfully passed
         if len(house_group) > 0:
@@ -161,7 +160,6 @@ def play():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                     #save and reload game
