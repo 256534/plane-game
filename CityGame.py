@@ -5,6 +5,7 @@ from settings import *
 from random import randint
 from button import Button
 from plane import Plane
+from os import path
 from mainmenu import MainMenu
 #create game instance
 pygame.init()
@@ -22,6 +23,9 @@ obstacles_passed = False
 window_width = 500
 window_height = 500
 
+
+
+
 # set background
 background = pygame.image.load('images/background.png')
 background = pygame.transform.rotozoom(background, 0, .5)
@@ -34,7 +38,6 @@ def draw_background():
         # fill in background
         screen.fill((255, 255, 255))
         screen.blit(background, (0, 0))
-
 
 def play():
     # settings
@@ -167,13 +170,20 @@ def play():
         screen.blit(img, (20, 20))
 
         #high score listed below current game score
-        #try:
-          #  with open('high_score.dat', 'rb') as file:
-               # score = pickle.load(file)
-        #except:
-           # score = 0
+        #file for high score
+        high_score = "highscore.txt"
+        #read high score file for score
+        dir = path.dirname(__file__)
+        with open(path.join(dir, high_score), 'r') as f:
+             highscore = int(f.read())
 
-        high_score = font.render(f"High score: {score}", True, (15, 10, 10))
+        #save highscore in file
+        if score > highscore:
+            highscore = score
+            with open(path.join(dir, high_score), 'w') as f:
+                f.write(str(score))
+
+        high_score = font.render(f"High score: {highscore}", True, (15, 10, 10))
         screen.blit(high_score, (20, 40))
 
         pygame.display.update()
