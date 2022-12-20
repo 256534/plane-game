@@ -41,7 +41,6 @@ def play():
     # settings
     clock = pygame.time.Clock()
     font = pygame.font.SysFont('comicsans', 24)
-    score = 0
     obstacles_passed = False
 
     #save and reload game
@@ -64,12 +63,12 @@ def play():
     last_house = pygame.time.get_ticks()
 
 
-
+    #runs through the actual game
     run = True
     while run:
         PLAY_MOUSE_POS = pygame.mouse.get_pos()
 
-        # draw background
+        # draws background
         draw_background()
 
         # initiates sound of crash/collision
@@ -77,7 +76,7 @@ def play():
         pygame.mixer.music.load('images/crashaudio.ogg')
 
 
-        # check for collision
+        # checks for collision using sprites
         cloud_collision = pygame.sprite.spritecollide(plane, cloud_group, True)
         house_collision = pygame.sprite.spritecollide(plane, house_group, True)
 
@@ -134,7 +133,7 @@ def play():
             cloud_frequency = 600
             house_frequency = 600
             
-        #random location of cloud generator
+        #random location of cloud (generator)
         cloud_height = randint(1, 15)
 
         # make obstacles recycle
@@ -167,7 +166,9 @@ def play():
                         json.dump(score, file)
                     main_menu()
             if plane.rect.bottom >= 450 or plane.rect.top <= 10:
+                #ends game when plane hits boundary of screen
                 run = False
+            #plane movements
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     plane.moving_up = True
@@ -194,7 +195,7 @@ def play():
             highscore = score
             with open(path.join(dir, high_score), 'w') as f:
                 f.write(str(score))
-
+        #prints high score on screen
         high_score = font.render(f"High score: {highscore}", True, (15, 10, 10))
         screen.blit(high_score, (20, 40))
 
@@ -204,16 +205,16 @@ def play():
 def options():
     while True:
         OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
-
-        screen.fill("white")
-
+        #fill in screen with a light blue color
+        screen.fill("light blue")
+        #text on the screen
         OPTIONS_TEXT = get_font(20).render(" play with up arrow key ", True, "Black")
         OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(250, 200))
         screen.blit(OPTIONS_TEXT, OPTIONS_RECT)
-
+        #button to go back to main menu
         OPTIONS_BACK = Button(image=None, pos=(250, 300),
                               text_input="BACK", font=get_font(25), base_color="Black", hovering_color="Green")
-
+        #change button color when hovering
         OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
         OPTIONS_BACK.update(screen)
 
@@ -233,7 +234,7 @@ def main_menu():
         screen.blit(background, (0, 0))
 
         MENU_MOUSE_POS = pygame.mouse.get_pos()
-
+        #button creation
         MENU_TEXT = get_font(50).render("MAIN MENU", True, "#b68f40")
         MENU_RECT = MENU_TEXT.get_rect(center=(250, 100))
         button = pygame.image.load('images/button.png')
@@ -250,7 +251,7 @@ def main_menu():
         for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
             button.changeColor(MENU_MOUSE_POS)
             button.update(screen)
-
+        #button actions
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
