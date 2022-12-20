@@ -1,11 +1,11 @@
 import pygame
 from pygame.sprite import Sprite
-
+from time import *
+from math import cos
 class Plane(Sprite):
     def __init__(self, x, y, screen):
         self.image = pygame.image.load('images/GreenPlane.png')
         self.image = pygame.transform.rotozoom(self.image, 0, .5)
-#plane_2_image = pygame.image.load('images/ RedPlane.png')
         self.rect = self.image.get_rect()
         self.rect.center = [x, y]
         self.screen = screen
@@ -29,4 +29,6 @@ class Plane(Sprite):
     def draw(self):
         self.screen.blit(self.image, self.rect)
 
-
+    def crash(self):
+        self.image = pygame.image.load('images/explosion.png')
+        self.image = pygame.transform.rotozoom(self.image, 0, .15)

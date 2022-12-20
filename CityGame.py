@@ -7,7 +7,7 @@ from button import Button
 from plane import Plane
 from os import path
 import json
-from mainmenu import MainMenu
+
 #create game instance
 pygame.init()
 pygame.display.set_caption("Plane Game")
@@ -28,9 +28,6 @@ window_height = 500
 background = pygame.image.load('images/background.png')
 background = pygame.transform.rotozoom(background, 0, .5)
 screen = pygame.display.set_mode((window_width, window_height))
-
-
-
 
 def get_font(size):  # Returns Press-Start-2P in the desired size
     return pygame.font.Font("images/font.ttf", size)
@@ -55,7 +52,7 @@ def play():
         with open('score.txt', 'r') as file:   
             score = json.load(file)            
     except:                                    
-        score = 0                              
+        score = 0
     # create/add first plane
     plane = Plane(50, int(window_height / 2), screen)
     #create cloud group and frequency
@@ -68,7 +65,10 @@ def play():
     house_frequency = 1000  # milliseconds
     last_house = pygame.time.get_ticks()
 
-    while True:
+
+
+    run = True
+    while run:
         PLAY_MOUSE_POS = pygame.mouse.get_pos()
 
         # draw background
@@ -78,15 +78,17 @@ def play():
         crash_sound = pygame.mixer.Sound('images/crashaudio.ogg')
         pygame.mixer.music.load('images/crashaudio.ogg')
 
+
         # check for collision
         cloud_collision = pygame.sprite.spritecollide(plane, cloud_group, True)
         house_collision = pygame.sprite.spritecollide(plane, house_group, True)
         if cloud_collision or house_collision:
-            #crash sound
+            #crash sound & explosion image
+            plane.crash()
             pygame.mixer.Sound.play(crash_sound)
             pygame.mixer.music.stop()
 
-            #sys.exit()
+            run = False
 
         #draw clouds on screen
         cloud_group.draw(screen)
@@ -97,6 +99,7 @@ def play():
         # draw plane on screen
         plane.draw()
         plane.update()
+
 
         # count how many houses player has successfully passed
         if len(house_group) > 0:
@@ -109,21 +112,18 @@ def play():
                 if plane.rect.left < house_group.sprites()[0].rect.left:
                     score += 1
                     obstacles_passed = False
-
-
-
-
+                    
         #check difficulty based on current score and make the obstacles move faster
         if score > 5:
+            cloud_group.update(2.15)
+            house_group.update(2.15)
+            cloud_frequency = 1000
+            house_frequency = 1000
+        if score > 10:
             cloud_group.update(2.25)
             house_group.update(2.25)
             cloud_frequency = 900
             house_frequency = 900
-        if score > 10:
-            cloud_group.update(2.5)
-            house_group.update(2.5)
-            cloud_frequency = 800
-            house_frequency = 800
         if score > 15:
             cloud_group.update(2.75)
             house_group.update(2.75)
@@ -139,7 +139,7 @@ def play():
         cloud_height = randint(1, 15)
 
         # make obstacles recycle
-        if game_over == False:
+        if run == True:
             time_now = pygame.time.get_ticks()
             if time_now - last_cloud > cloud_frequency:
                 skies = Sky(400, int(window_height / cloud_height))
@@ -150,17 +150,18 @@ def play():
                 grounds = Ground(400, 500)
                 house_group.add(grounds)
                 last_house = time_now
-
+        #back button during game
         PLAY_BACK = Button(image=None, pos=(450, 450),
                            text_input="BACK", font=get_font(10), base_color="White", hovering_color="Green")
 
         PLAY_BACK.changeColor(PLAY_MOUSE_POS)
         PLAY_BACK.update(screen)
-
+        #game movements(exit, save game, key input)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                     #save and reload game
@@ -168,7 +169,7 @@ def play():
                         json.dump(score, file)
                     main_menu()
             if plane.rect.bottom >= 450 or plane.rect.top <= 10:
-                sys.exit()
+                run = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     plane.moving_up = True
@@ -178,7 +179,7 @@ def play():
 
         clock.tick(60)
         pygame.display.set_caption(f"Plane Game {clock.get_fps():.0f}")
-        # add in a score
+        #score on screen
         img = font.render(f"Score: {score}", True, (15, 10, 10))
         screen.blit(img, (20, 20))
 
@@ -201,14 +202,14 @@ def play():
 
         pygame.display.update()
 
-
+#options button on home screen
 def options():
     while True:
         OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
 
         screen.fill("white")
 
-        OPTIONS_TEXT = get_font(25).render(" How to play:\n use up arrow key \n to keep plane up \n and avoid obstacles.", True, "Black")
+        OPTIONS_TEXT = get_font(20).render(" play with up arrow key ", True, "Black")
         OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(250, 200))
         screen.blit(OPTIONS_TEXT, OPTIONS_RECT)
 
@@ -224,10 +225,6 @@ def options():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
-                     #save and reload game
-                     with open('score.txt', 'w') as file:
-                         json.dump(score, file)
-
                      main_menu()
 
         pygame.display.update()
