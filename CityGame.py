@@ -1,5 +1,5 @@
 import sys
-import pygame
+from pygame import *
 from time import *
 from settings import *
 from random import randint
@@ -34,6 +34,8 @@ def draw_background():
         # fill in background
         screen.fill((255, 255, 255))
         screen.blit(background, (0, 0))
+
+
 def play():
     # settings
     clock = pygame.time.Clock()
@@ -47,11 +49,12 @@ def play():
     plane = Plane(50, int(window_height / 2), screen)
     #create cloud group and frequency
     cloud_group = pygame.sprite.Group()
-    cloud_frequency = 1000  # miliseconds
+    cloud_frequency = 1000  # milliseconds
     last_cloud = pygame.time.get_ticks()
+
     #create house group and frequency
     house_group = pygame.sprite.Group()
-    house_frequency = 1000  # miliseconds
+    house_frequency = 1000  # milliseconds
     last_house = pygame.time.get_ticks()
 
     while True:
@@ -59,11 +62,20 @@ def play():
 
         # draw background
         draw_background()
+
+        # initiates sound of crash/collision
+        crash_sound = pygame.mixer.Sound('images/crashaudio.ogg')
+        pygame.mixer.music.load('images/crashaudio.ogg')
+
         # check for collision
         cloud_collision = pygame.sprite.spritecollide(plane, cloud_group, True)
         house_collision = pygame.sprite.spritecollide(plane, house_group, True)
         if cloud_collision or house_collision:
-            sys.exit()
+            #crash sound
+            pygame.mixer.Sound.play(crash_sound)
+            pygame.mixer.music.stop()
+
+            #sys.exit()
 
         #draw clouds on screen
         cloud_group.draw(screen)
@@ -86,8 +98,29 @@ def play():
                 if plane.rect.left < house_group.sprites()[0].rect.left:
                     score += 1
                     obstacles_passed = False
-        #print(score)
 
+        #check difficulty based on current score and make the obstacles move faster
+        if score > 5:
+            cloud_group.update(2.25)
+            house_group.update(2.25)
+            cloud_frequency = 900
+            house_frequency = 900
+        if score > 10:
+            cloud_group.update(2.5)
+            house_group.update(2.5)
+            cloud_frequency = 800
+            house_frequency = 800
+        if score > 15:
+            cloud_group.update(2.75)
+            house_group.update(2.75)
+            cloud_frequency = 700
+            house_frequency = 700
+        if score > 20:
+            cloud_group.update(3)
+            house_group.update(3)
+            cloud_frequency = 600
+            house_frequency = 600
+        #random location of cloud generator
         cloud_height = randint(1, 15)
 
         # make obstacles recycle
@@ -102,16 +135,6 @@ def play():
                 grounds = Ground(400, 500)
                 house_group.add(grounds)
                 last_house = time_now
-        # if game_over == True:
-        # if button.draw() == True:
-        # game_over = False
-
-        #for event in pygame.event.get():
-
-
-        #PLAY_TEXT = get_font(25).render("PLAY screen.", True, "White")
-        #PLAY_RECT = PLAY_TEXT.get_rect(center=(250, 200))
-        #screen.blit(PLAY_TEXT, PLAY_RECT)
 
         PLAY_BACK = Button(image=None, pos=(450, 450),
                            text_input="BACK", font=get_font(10), base_color="White", hovering_color="Green")
@@ -136,13 +159,22 @@ def play():
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP:
                     plane.moving_up = False
+
         clock.tick(60)
         pygame.display.set_caption(f"Plane Game {clock.get_fps():.0f}")
         # add in a score
         img = font.render(f"Score: {score}", True, (15, 10, 10))
         screen.blit(img, (20, 20))
 
+        #high score listed below current game score
+        #try:
+          #  with open('high_score.dat', 'rb') as file:
+               # score = pickle.load(file)
+        #except:
+           # score = 0
 
+        high_score = font.render(f"High score: {score}", True, (15, 10, 10))
+        screen.blit(high_score, (20, 40))
 
         pygame.display.update()
 

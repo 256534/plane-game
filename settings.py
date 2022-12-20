@@ -33,17 +33,16 @@ class Sky(pygame.sprite.Sprite):
         self.screen_rect = screen.get_rect()
         self.rect.midtop = [x, y]
 
-    def update(self):
-        self.rect.x -= 2
+    def update(self, speed = 2):
+        self.rect.x -= speed
+        #speed -= 2
         if self.rect.right < 100:
             self.kill()
 
     def draw(self):
         self.screen.blit(self.image, self.rect)
 
-    cloud_group = pygame.sprite.Group()
-    cloud_frequency = 1000  # miliseconds
-    last_cloud = pygame.time.get_ticks()
+
 
 class Ground(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -61,15 +60,12 @@ class Ground(pygame.sprite.Sprite):
         self.screen_rect = screen.get_rect()
         self.rect.midbottom = [x, y]
 
-    def update(self):
+    def update(self, speed = 2):
             # scrolling
-        self.rect.x -= 2
+        self.rect.x -= speed
         if self.rect.right < 100:
             self.kill()
 
     def draw(self):
         self.screen.blit(self.image, self.rect)
 
-    house_group = pygame.sprite.Group()
-    house_frequency = 1000  # miliseconds
-    last_house = pygame.time.get_ticks()
