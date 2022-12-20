@@ -6,6 +6,7 @@ from random import randint
 from button import Button
 from plane import Plane
 from os import path
+import json
 from mainmenu import MainMenu
 #create game instance
 pygame.init()
@@ -23,13 +24,13 @@ obstacles_passed = False
 window_width = 500
 window_height = 500
 
-
-
-
 # set background
 background = pygame.image.load('images/background.png')
 background = pygame.transform.rotozoom(background, 0, .5)
 screen = pygame.display.set_mode((window_width, window_height))
+
+
+
 
 def get_font(size):  # Returns Press-Start-2P in the desired size
     return pygame.font.Font("images/font.ttf", size)
@@ -48,6 +49,13 @@ def play():
     score = 0
     obstacles_passed = False
 
+    #save and reload game
+    #reads score file to reload game
+    try:                                       
+        with open('score.txt', 'r') as file:   
+            score = json.load(file)            
+    except:                                    
+        score = 0                              
     # create/add first plane
     plane = Plane(50, int(window_height / 2), screen)
     #create cloud group and frequency
@@ -102,6 +110,9 @@ def play():
                     score += 1
                     obstacles_passed = False
 
+
+
+
         #check difficulty based on current score and make the obstacles move faster
         if score > 5:
             cloud_group.update(2.25)
@@ -123,6 +134,7 @@ def play():
             house_group.update(3)
             cloud_frequency = 600
             house_frequency = 600
+            
         #random location of cloud generator
         cloud_height = randint(1, 15)
 
@@ -151,10 +163,11 @@ def play():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
+                    #save and reload game
+                    with open('score.txt', 'w') as file:
+                        json.dump(score, file)
                     main_menu()
-            if plane.rect.bottom >= 450:
-                sys.exit()
-            if plane.rect.top <= 10:
+            if plane.rect.bottom >= 450 or plane.rect.top <= 10:
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
@@ -211,7 +224,11 @@ def options():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
-                    main_menu()
+                     #save and reload game
+                     with open('score.txt', 'w') as file:
+                         json.dump(score, file)
+
+                     main_menu()
 
         pygame.display.update()
 
@@ -253,13 +270,6 @@ def main_menu():
                     sys.exit()
 
         pygame.display.update()
-
-
-
-
-#game over screen
-#end game w sound effect
-#make game speed up over time
 
 
 #Run game
