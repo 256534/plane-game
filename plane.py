@@ -11,10 +11,9 @@ class Plane(Sprite):
         self.screen = screen
         self.vel = 0
         self.moving_up = False
-        #moving = False
+
 
     def update(self):
-        #if moving == True:
         self.vel += 0.5
         # create gravity
         if self.vel > 9:
